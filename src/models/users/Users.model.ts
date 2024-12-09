@@ -1,16 +1,30 @@
 import { Schema, model, Types, Document } from "mongoose";
 import validator from "validator";
 
-interface UsersI {
+export interface UsersSchemaAPIInput {
 	email: string;
 	userFullName: string;
-	verified: boolean;
 	password: string;
+}
+
+export interface UsersSchema extends UsersSchemaAPIInput {
+	verified: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
-const usersSchema = new Schema<UsersI>(
+type UserDocument = Document<unknown, {}, UsersSchema> &
+	UsersSchema & {
+		_id: Types.ObjectId;
+	};
+
+export type UserCompleteData = UsersSchema & {
+	userId: string;
+};
+
+export type UsersSchemaAPIOutput = Omit<UserCompleteData, "password">;
+
+const usersSchema = new Schema<UsersSchema>(
 	{
 		email: {
 			type: String,
@@ -50,15 +64,6 @@ const usersSchema = new Schema<UsersI>(
 );
 
 const UsersM = model("Users", usersSchema);
-
-export type UserCompleteData = UsersI & {
-	userId: string;
-};
-
-type UserDocument = Document<unknown, {}, UsersI> &
-	UsersI & {
-		_id: Types.ObjectId;
-	};
 
 const generateCompleteUserData = (user: UserDocument) => {
 	const data: UserCompleteData = {
@@ -115,7 +120,9 @@ const userEmailExists = async (email: string) => {
 /**
  * Insert a new user.
  */
-const insertUser = async (data: Omit<UsersI, "createdAt" | "updatedAt">) => {
+const insertUser = async (
+	data: Omit<UsersSchema, "createdAt" | "updatedAt">,
+) => {
 	const userExists = await userEmailExists(data.email);
 	if (userExists) {
 		throw new Error("User already exists!");
@@ -138,7 +145,7 @@ const insertUser = async (data: Omit<UsersI, "createdAt" | "updatedAt">) => {
 const updateUser = async ({
 	userId,
 	...data
-}: Omit<UsersI, "email"> & { userId: string }) => {
+}: Partial<Omit<UsersSchema, "email">> & { userId: string }) => {
 	const user = await UsersM.findById(userId);
 
 	if (user) {
