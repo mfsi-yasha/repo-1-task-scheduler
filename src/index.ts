@@ -26,10 +26,10 @@ const errorHandler = (
 	err: Error,
 	req: Request,
 	res: Response,
-	next: NextFunction
+	next: NextFunction,
 ): void => {
 	console.error(err.stack); // log the error stack
-	res.status(500).send({ error: 'Something went wrong!' });
+	res.status(500).send({ error: "Something went wrong!" });
 };
 
 /**
@@ -46,18 +46,18 @@ app.use(helmet());
 app.use(
 	helmet.referrerPolicy({
 		policy: "no-referrer",
-	})
+	}),
 );
 app.use(function (req, res, next) {
 	res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE");
 	res.header("Access-Control-Allow-Credentials", "true");
 	res.header(
 		"Access-Control-Allow-Headers",
-		"Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization"
+		"Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization",
 	);
 	res.setHeader(
 		"Content-Security-Policy",
-		"script-src 'self' https://cdn.jsdelivr.net;"
+		"script-src 'self' https://cdn.jsdelivr.net;",
 	);
 	res.setHeader("X-Frame-Options", "SAMEORIGIN");
 	res.setHeader("X-XSS-Protection", "1; mode=block");
@@ -68,7 +68,7 @@ app.use(
 	rateLimit({
 		windowMs: 2 * 60 * 1000, // 2 minutes
 		max: 1000, // limit each IP to 1000 requests per windowMs
-	})
+	}),
 );
 
 /**
@@ -88,6 +88,6 @@ app.use(errorHandler);
  * @param port - Port number on which the server will listen.
  * @param callback () => void - Callback function invoked when the server starts listening.
  */
-app.listen(parseInt(KEYS.APP_ENVS.PORT), () => {
+app.listen(KEYS.APP_ENVS.PORT, () => {
 	console.log(`Server running at http://localhost:${KEYS.APP_ENVS.PORT}`);
 });
