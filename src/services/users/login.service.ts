@@ -1,7 +1,7 @@
 import { matchPasswords } from "src/utils/validations";
 import UsersModel, { UsersSchemaAPIOutput } from "src/models/users/Users.model";
 
-async function verifyUserService({
+async function loginService({
 	email,
 	password,
 }: {
@@ -35,4 +35,4 @@ async function verifyUserService({
 	}
 }
 
-export default verifyUserService;
+export default loginService;

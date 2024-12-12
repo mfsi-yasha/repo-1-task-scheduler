@@ -12,7 +12,7 @@ async function changePasswordService(
 	params: ChangePasswordParams,
 ): Promise<boolean> {
 	if (!(params.oldPassword || params.newPassword)) {
-		throw Error("Parameters not set!");
+		throw new Error("Parameters not set!");
 	}
 
 	const passwordValid = isValidPassword(params.newPassword);
@@ -38,9 +38,9 @@ async function changePasswordService(
 			return true;
 		}
 
-		throw Error("Validation failed!");
+		throw new Error("Validation failed!");
 	} else {
-		throw Error("User not found!");
+		throw new Error("User not found!");
 	}
 }
 

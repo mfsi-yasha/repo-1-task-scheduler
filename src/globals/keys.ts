@@ -9,7 +9,6 @@ const APP_ENVS = {
 	JWT_SECRET: process.env.JWT_SECRET as string,
 	COOKIE_SECRET: process.env.COOKIE_SECRET as string,
 	SERVE_BASE_PATH: process.env.SERVE_BASE_PATH as string,
-	ALLOW_EMAIL_SEND: process.env.ALLOW_EMAIL_SEND === "true" ? true : false,
 };
 
 const MONGO_KEYS = {
@@ -35,9 +34,7 @@ for (const key in KEYS) {
 			Record<string, undefined | string | number | boolean>
 		>
 	)[key];
-	if (key === "SMTP_KEYS" ? !KEYS.APP_ENVS.ALLOW_EMAIL_SEND : false) {
-		continue;
-	}
+
 	for (const eleKey in element) {
 		switch (eleKey) {
 			case "PORT": {

@@ -1,4 +1,5 @@
 import { Router } from "express";
+import user from "./routes/user/user";
 import home from "./controllers/home";
 
 /**
@@ -8,5 +9,7 @@ import home from "./controllers/home";
 const api: Router = Router({ mergeParams: true });
 
 api.get("/", home.controller);
+
+api.use("/user", user);
 
 export default api;

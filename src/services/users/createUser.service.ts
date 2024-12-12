@@ -5,6 +5,9 @@ import UsersModel, {
 } from "src/models/users/Users.model";
 import { isValidPassword } from "src/utils/validations";
 import { encryptPassword } from "src/utils/auth";
+import UsersOTPModel from "src/models/users/UsersOTP.model";
+import sendEmailService from "../email/sendEmail.service";
+import signupEmail from "src/templates/emails/signup.email";
 
 async function createUserService(
 	params: UsersSchemaAPIInput,
@@ -28,6 +31,20 @@ async function createUserService(
 	const user = await UsersModel.insertUser({
 		...params,
 		verified: false,
+	});
+
+	const otp = await UsersOTPModel.updateUsersOTP({
+		userId: user.userId,
+		context: "signup",
+	});
+
+	sendEmailService({
+		to: user.email,
+		...signupEmail({
+			toName: user.userFullName,
+			otp,
+			expiryTime: "1 hour",
+		}),
 	});
 
 	const userValue: UsersSchemaAPIOutput = {
