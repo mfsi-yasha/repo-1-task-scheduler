@@ -1,6 +1,5 @@
 import { CookiePayload } from "src/middlewares/auth.middleware";
 import { RequestType, ResponseDataType, ResponseType } from "src/globals/types";
-import logger from "src/utils/logger";
 import sendOTPService from "src/services/users/sendOTP.service";
 
 interface Params {}
@@ -34,7 +33,7 @@ const controller = async (
 				msg: "OTP sent.",
 				errors: [],
 			};
-			res.status(200).json(resValue);
+			res.status(201).json(resValue);
 		} else {
 			throw new Error("Invalid user!");
 		}
@@ -45,7 +44,7 @@ const controller = async (
 			msg: "Failed to resend OTP!",
 			errors: [error.message],
 		};
-		res.status(401).json(resError);
+		res.status(400).json(resError);
 	}
 };
 

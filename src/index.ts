@@ -12,7 +12,9 @@ import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
 import api from "src/api/api";
+import apiDocs from "src/api/api.docs";
 
 /**
  * Used to handle the global errors.
@@ -77,6 +79,25 @@ app.use(
  * @param {typeof api} callback - Express router containing API routes.
  */
 app.use(`${KEYS.APP_ENVS.SERVE_BASE_PATH}/api`, api);
+
+/**
+ * Mount the router for public routes.
+ * @param path "{KEYS.APP_ENVS.SERVE_BASE_PATH}/" - Base path for serving static files.
+ * @param {typeof express.static} callback - Middleware for serving static files.
+ */
+app.use(
+	`${KEYS.APP_ENVS.SERVE_BASE_PATH}/`,
+	express.static(KEYS.APP_ENVS.PUBLIC_DIR),
+);
+
+/**
+ * Serve swagger ui
+ */
+app.use(
+	`${KEYS.APP_ENVS.SERVE_BASE_PATH}/api-docs`,
+	swaggerUi.serve,
+	swaggerUi.setup(apiDocs),
+);
 
 /**
  * Writing global error handller in the last.

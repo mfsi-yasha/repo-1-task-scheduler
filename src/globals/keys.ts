@@ -5,6 +5,7 @@ config();
 const APP_ENVS = {
 	PORT: parseInt(process.env.PORT ?? ""),
 	LOGS_DIR: process.env.LOGS_DIR as string,
+	PUBLIC_DIR: process.env.PUBLIC_DIR as string,
 	NODE_ENV: process.env.NODE_ENV as "development" | "production" | "staging",
 	JWT_SECRET: process.env.JWT_SECRET as string,
 	COOKIE_SECRET: process.env.COOKIE_SECRET as string,

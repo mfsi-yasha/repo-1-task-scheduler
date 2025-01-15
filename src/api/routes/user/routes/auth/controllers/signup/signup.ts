@@ -1,5 +1,4 @@
 import { RequestType, ResponseDataType, ResponseType } from "src/globals/types";
-import logger from "src/utils/logger";
 import createUserService from "src/services/users/createUser.service";
 import { applyCookie } from "src/middlewares/auth.middleware";
 import { NextFunction } from "express";
@@ -66,9 +65,7 @@ const controller = async (
 				msg: "User already exists. Please login.",
 				errors: [],
 			};
-			req.cookies;
-			req.signedCookies;
-			res.status(201).json(returnValue);
+			res.status(400).json(returnValue);
 		} else {
 			const user = await createUserService(req.body);
 			const returnValue: ResponseDataType<{ user: typeof user }> = {

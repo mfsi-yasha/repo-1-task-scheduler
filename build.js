@@ -20,7 +20,10 @@ function replacePathsInFiles(dir) {
 			let fileContent = fs.readFileSync(filePath, "utf-8");
 
 			// Replace 'src/' with __dirname
-			fileContent = fileContent.replaceAll(`"src/`, `__dirname + "/`);
+			fileContent = fileContent.replaceAll(
+				`"src/`,
+				`require("path").join(__dirname.split("dist")[0], "/dist") + "/`,
+			);
 
 			// Write the modified content back to the file
 			fs.writeFileSync(filePath, fileContent, "utf-8");

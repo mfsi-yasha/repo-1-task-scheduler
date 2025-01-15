@@ -1,6 +1,5 @@
 import { CookiePayload, applyCookie } from "src/middlewares/auth.middleware";
 import { RequestType, ResponseDataType, ResponseType } from "src/globals/types";
-import logger from "src/utils/logger";
 import { NextFunction } from "express";
 import verifySignupService from "src/services/users/verifySignup.service";
 
@@ -65,7 +64,7 @@ const controller = async (
 				errors: [],
 			};
 			applyCookie(res, user, "login");
-			res.status(200).json(resValue);
+			res.status(201).json(resValue);
 		} else {
 			throw new Error("OTP not valid!");
 		}
@@ -76,7 +75,7 @@ const controller = async (
 			msg: "User not verified",
 			errors: [error.message],
 		};
-		res.status(401).json(resError);
+		res.status(400).json(resError);
 	}
 };
 

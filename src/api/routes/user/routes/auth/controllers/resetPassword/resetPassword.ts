@@ -1,8 +1,6 @@
-import { applyCookie, CookiePayload } from "src/middlewares/auth.middleware";
+import { CookiePayload } from "src/middlewares/auth.middleware";
 import { RequestType, ResponseDataType, ResponseType } from "src/globals/types";
-import logger from "src/utils/logger";
 import { NextFunction } from "express";
-import sendOTPService from "src/services/users/sendOTP.service";
 import resetPasswordService from "src/services/users/resetPassword.service";
 
 interface Params {}
@@ -64,7 +62,7 @@ const controller = async (
 			const resValue: ResponseDataType<undefined> = {
 				err: false,
 				statusName: "success",
-				msg: "Give new password.",
+				msg: "New password added.",
 				errors: [],
 			};
 			res.status(200).json(resValue);

@@ -19,7 +19,8 @@ async function resetPasswordService(
 	payload.newPassword = await encryptPassword(payload.newPassword);
 
 	const verified = await UsersOTPModel.verifyUsersOTP({
-		...payload,
+		userId: payload.userId,
+		otp: payload.otp,
 		context: "reset-password",
 	});
 

@@ -6,6 +6,7 @@ import verifyUser from "./controllers/verifyUser/verifyUser";
 import resendOTP from "./controllers/resendOTP/resendOTP";
 import authMiddleware from "src/middlewares/auth.middleware";
 import logout from "./controllers/logout/logout";
+import requestResetPassword from "./controllers/requestResetPassword/requestResetPassword";
 
 /**
  * Express router for handling user/auth related routes.
@@ -19,8 +20,8 @@ auth.post("/signup", signup.validate, signup.controller);
 
 auth.post(
 	"/request-reset-password",
-	resetPassword.validate,
-	resetPassword.controller,
+	requestResetPassword.validate,
+	requestResetPassword.controller,
 );
 
 auth.post(
@@ -35,7 +36,7 @@ auth.post(
 	resendOTP.controller,
 );
 
-auth.post(
+auth.patch(
 	"/reset-password",
 	authMiddleware.resetPasswordController,
 	resetPassword.validate,

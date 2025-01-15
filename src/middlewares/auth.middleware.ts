@@ -98,7 +98,7 @@ const resetPasswordController = async (
 			err: true,
 			statusName: "forbidden",
 			msg: "Forbidden: Session not found.",
-			errors: [],
+			errors: [error.message],
 		};
 		res.status(403).json(returnErr);
 	}

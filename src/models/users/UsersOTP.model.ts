@@ -55,7 +55,10 @@ const verifyUsersOTP = async (
 	{ otp, ...payload }: UsersOTPCompleteData,
 	resetOTP = true,
 ) => {
-	const user = await UsersOTPM.findOne(payload);
+	const user = await UsersOTPM.findOne({
+		userId: payload.userId,
+		context: payload.context,
+	});
 	if (user) {
 		const { otp: decodedOTP } = validateJWT(user.otp + "");
 		if (resetOTP) {

@@ -1,6 +1,5 @@
 import { CookiePayload } from "src/middlewares/auth.middleware";
 import { RequestType, ResponseDataType, ResponseType } from "src/globals/types";
-import logger from "src/utils/logger";
 import changePasswordService, {
 	ChangePasswordParams,
 } from "src/services/users/changePassword.service";
@@ -79,7 +78,7 @@ const controller = async (
 			msg: "Password Not Changed.",
 			errors: [error.message],
 		};
-		res.status(401).json(resError);
+		res.status(400).json(resError);
 	}
 };
 

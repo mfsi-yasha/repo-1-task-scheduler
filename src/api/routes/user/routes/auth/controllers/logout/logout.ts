@@ -1,6 +1,5 @@
 import { CookiePayload } from "src/middlewares/auth.middleware";
 import { RequestType, ResponseDataType, ResponseType } from "src/globals/types";
-import logger from "src/utils/logger";
 
 interface Params {}
 interface Body {}
