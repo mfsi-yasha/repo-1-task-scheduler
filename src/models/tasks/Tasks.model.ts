@@ -1,18 +1,24 @@
 import { Schema, model, Types, FilterQuery, Document } from "mongoose";
+import validator from "validator";
 import { createWordMatchingRegex } from "src/utils/utils";
 
 export type TaskStatusesT = "toDo" | "inProgress" | "done";
-export interface TasksSchema {
+
+export interface TaskSchemaInput {
+	userId: Types.ObjectId;
 	name: string;
 	description: string;
 	status: TaskStatusesT;
 	dueDate: Date;
+}
+export interface TasksSchema extends TaskSchemaInput {
 	deleted: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
 export interface GetAllTaskFilters {
+	userId: string;
 	searchText?: string;
 	dueDateMin?: string;
 	dueDateMax?: string;
@@ -33,12 +39,17 @@ type TasksDocument = Document<unknown, {}, TasksSchema> &
 		_id: Types.ObjectId;
 	};
 
-export type TasksCompleteData = TasksSchema & {
+export type TasksCompleteData = Omit<TasksSchema, "userId"> & {
 	taskId: string;
+	userId: string;
 };
 
 const tasksSchema = new Schema<TasksSchema>(
 	{
+		userId: {
+			type: Schema.Types.ObjectId,
+			required: [true, "Key - userId is required."],
+		},
 		name: {
 			type: String,
 			required: [true, "Key - name is required."],
@@ -92,6 +103,7 @@ const TasksM = model("Tasks", tasksSchema);
 const generateCompleteTaskData = (task: TasksDocument) => {
 	const data: TasksCompleteData = {
 		taskId: task._id.toHexString(),
+		userId: task.userId.toHexString(),
 		name: task.name,
 		description: task.description,
 		status: task.status,
@@ -122,12 +134,69 @@ const getTasksByIds = async (ids: Array<string>) => {
 	return tasks.map(user => generateCompleteTaskData(user));
 };
 
+const validateFilters = (filters: GetAllTaskFilters) => {
+	const errors: Array<string> = [];
+
+	if (filters.start !== undefined) {
+		if (
+			typeof filters.start === "number"
+				? filters.start < 0
+					? true
+					: false
+				: true
+		) {
+			errors.push("Key - start must be a number and >= 0.");
+		}
+	}
+	if (filters.limit !== undefined) {
+		if (
+			typeof filters.limit === "number"
+				? filters.limit <= 0
+					? true
+					: false
+				: true
+		) {
+			errors.push("Key - limit must be a number and grreater than 0.");
+		}
+	}
+	if (filters.searchText !== undefined) {
+		if (typeof filters.searchText !== "string") {
+			errors.push("Key - searchText must be a string.");
+		}
+	}
+	if (filters.createdDateMax !== undefined) {
+		if (!validator.isDate(filters.createdDateMax)) {
+			errors.push("Key - createdDateMax must be a date.");
+		}
+	}
+	if (filters.createdDateMin !== undefined) {
+		if (!validator.isDate(filters.createdDateMin)) {
+			errors.push("Key - createdDateMin must be a date.");
+		}
+	}
+	if (filters.dueDateMax !== undefined) {
+		if (!validator.isDate(filters.dueDateMax)) {
+			errors.push("Key - dueDateMax must be a date.");
+		}
+	}
+	if (filters.dueDateMin !== undefined) {
+		if (!validator.isDate(filters.dueDateMin)) {
+			errors.push("Key - dueDateMin must be a date.");
+		}
+	}
+
+	return errors;
+};
+
 const getAllTasks = async ({
 	start = 0,
 	limit = 25,
 	...filters
 }: GetAllTaskFilters): Promise<Array<TasksCompleteData>> => {
-	const query: FilterQuery<TasksSchema> = { deleted: false };
+	const query: FilterQuery<TasksSchema> = {
+		deleted: false,
+		userId: filters.userId,
+	};
 	if (filters.searchText?.trim()) {
 		query.name = {
 			$regex: createWordMatchingRegex(filters.searchText),
@@ -163,9 +232,10 @@ const getAllTasks = async ({
  * Insert a new task.
  */
 const insertTask = async (
-	data: Omit<TasksSchema, "createdAt" | "updatedAt">,
+	data: Omit<TaskSchemaInput, "userId"> & { userId: string },
 ) => {
 	const task = new TasksM({
+		userId: data.userId,
 		name: data.name,
 		description: data.description,
 		dueDate: data.dueDate,
@@ -180,15 +250,17 @@ const insertTask = async (
 /**
  * Update an existing task.
  */
-const updateUser = async ({
+const updateTask = async ({
 	taskId,
+	userId,
 	...data
-}: Partial<Omit<TasksSchema, "createdAt" | "updatedAt">> & {
+}: Partial<Omit<TaskSchemaInput, "userId">> & {
 	taskId: string;
+	userId: string;
 }) => {
 	const task = await TasksM.findById(taskId);
 
-	if (task) {
+	if (task?.userId?.toHexString() === userId) {
 		let updated = false;
 
 		if (data.name !== undefined) {
@@ -207,10 +279,6 @@ const updateUser = async ({
 			task.dueDate = data.dueDate;
 			updated = true;
 		}
-		if (data.deleted !== undefined) {
-			task.deleted = data.deleted;
-			updated = true;
-		}
 
 		if (updated) {
 			await task.save();
@@ -223,10 +291,23 @@ const updateUser = async ({
 	}
 };
 
+/**
+ * Delete task by id.
+ */
+const deleteTaskById = async (id: string) => {
+	const task = await TasksM.findById(id);
+	if (task) {
+		task.deleted = true;
+		await task.save();
+	}
+};
+
 export default {
 	getTaskById,
 	getTasksByIds,
+	validateFilters,
 	getAllTasks,
 	insertTask,
-	updateUser,
+	updateTask,
+	deleteTaskById,
 };
