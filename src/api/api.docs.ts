@@ -9,6 +9,7 @@ import userAuthVerifyUserDocs from "./routes/user/routes/auth/controllers/verify
 import userAuthResendOTPDocs from "./routes/user/routes/auth/controllers/resendOTP/user.auth.resendOTP.docs";
 import userAuthResetPasswordReqDocs from "./routes/user/routes/auth/controllers/requestResetPassword/user.auth.resetPasswordReq.docs";
 import userGetDetailsDocs from "./routes/user/controllers/getDetails/user.getDetails.docs";
+import tasksDocs from "./routes/tasks/tasks.docs";
 
 const apiDocs: OpenAPIV3.Document = {
 	openapi: "3.0.3",
@@ -40,6 +41,10 @@ const apiDocs: OpenAPIV3.Document = {
 			name: "user/auth",
 			description: "User Auth APIs",
 		},
+		{
+			name: "tasks",
+			description: "Tasks APIs",
+		},
 	],
 	paths: {
 		...homeDocs,
@@ -52,6 +57,7 @@ const apiDocs: OpenAPIV3.Document = {
 		...userAuthResetPasswordReqDocs,
 		...userAuthResendOTPDocs,
 		...userAuthResetPasswordDocs,
+		...tasksDocs,
 	},
 	components: {
 		schemas: {

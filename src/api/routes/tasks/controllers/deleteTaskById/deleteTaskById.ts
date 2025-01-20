@@ -25,7 +25,7 @@ const controller = async (
 			msg: "Task deleted.",
 			errors: [],
 		};
-		res.status(200).json(returnValue);
+		res.status(201).json(returnValue);
 	} catch (error: any) {
 		const returnErr: ResponseDataType<undefined> = {
 			err: true,

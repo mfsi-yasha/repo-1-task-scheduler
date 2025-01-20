@@ -17,7 +17,10 @@ const controller = async (
 	res: ResponseType,
 ): Promise<void> => {
 	try {
-		const task = await TasksModel.getTaskById(req.params?.taskId + "");
+		const task = await TasksModel.getTaskById(
+			req.params?.taskId + "",
+			req.body?.cookiePayload?.userId + "",
+		);
 
 		if (!task) {
 			throw new Error("Task not found!");

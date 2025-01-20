@@ -118,8 +118,8 @@ const generateCompleteTaskData = (task: TasksDocument) => {
 /**
  * Retrieve task by id.
  */
-const getTaskById = async (id: string) => {
-	const task = await TasksM.findById(id);
+const getTaskById = async (taskId: string, userId: string) => {
+	const task = await TasksM.findOne({ _id: taskId, userId, deleted: false });
 	if (task) {
 		return generateCompleteTaskData(task);
 	} else {
@@ -127,9 +127,11 @@ const getTaskById = async (id: string) => {
 	}
 };
 
-const getTasksByIds = async (ids: Array<string>) => {
+const getTasksByIds = async (ids: Array<string>, userId: string) => {
 	const tasks = await TasksM.find({
 		_id: { $in: ids.map(id => new Types.ObjectId(id)) },
+		userId,
+		deleted: false,
 	});
 	return tasks.map(user => generateCompleteTaskData(user));
 };
@@ -139,24 +141,28 @@ const validateFilters = (filters: GetAllTaskFilters) => {
 
 	if (filters.start !== undefined) {
 		if (
-			typeof filters.start === "number"
+			typeof parseInt(filters.start + "") === "number"
 				? filters.start < 0
 					? true
 					: false
 				: true
 		) {
 			errors.push("Key - start must be a number and >= 0.");
+		} else {
+			filters.start = parseInt(filters.start + "");
 		}
 	}
 	if (filters.limit !== undefined) {
 		if (
-			typeof filters.limit === "number"
-				? filters.limit <= 0
+			typeof parseInt(filters.limit + "") === "number"
+				? filters.limit <= 0 || filters.limit > 25
 					? true
 					: false
 				: true
 		) {
-			errors.push("Key - limit must be a number and grreater than 0.");
+			errors.push("Key - limit must be a number and > 0 and <= 25.");
+		} else {
+			filters.limit = parseInt(filters.limit + "");
 		}
 	}
 	if (filters.searchText !== undefined) {
@@ -198,9 +204,18 @@ const getAllTasks = async ({
 		userId: filters.userId,
 	};
 	if (filters.searchText?.trim()) {
-		query.name = {
-			$regex: createWordMatchingRegex(filters.searchText),
-		};
+		query["$or"] = [
+			{
+				name: {
+					$regex: createWordMatchingRegex(filters.searchText),
+				},
+			},
+			{
+				description: {
+					$regex: createWordMatchingRegex(filters.searchText),
+				},
+			},
+		];
 	}
 	if (filters.createdDateMin || filters.createdDateMax) {
 		query.createdAt = {};

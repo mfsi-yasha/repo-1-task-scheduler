@@ -3,7 +3,7 @@ import { CookiePayload } from "src/middlewares/auth.middleware";
 import TasksModel, { GetAllTaskFilters } from "src/models/tasks/Tasks.model";
 
 interface Params {}
-type Body = Omit<GetAllTaskFilters, "userId">;
+type Body = {};
 
 /**
  * Controller function to handle get tesk request.
@@ -11,14 +11,19 @@ type Body = Omit<GetAllTaskFilters, "userId">;
  * @param res - Express Response object.
  */
 const controller = async (
-	req: RequestType<Params, Body, CookiePayload>,
+	req: RequestType<
+		Params,
+		Body,
+		CookiePayload,
+		Omit<GetAllTaskFilters, "userId">
+	>,
 	res: ResponseType,
 ): Promise<void> => {
 	try {
-		const { cookiePayload, ...filters } = req.body ?? {};
+		const filters = req.query ?? {};
 
 		const errors = TasksModel.validateFilters({
-			userId: cookiePayload.userId,
+			userId: req.body.cookiePayload.userId,
 			...(filters ?? {}),
 		});
 
@@ -32,7 +37,7 @@ const controller = async (
 			res.status(400).json(returnErr);
 		} else {
 			const tasks = await TasksModel.getAllTasks({
-				userId: cookiePayload.userId,
+				userId: req.body.cookiePayload.userId,
 				...(filters ?? {}),
 			});
 
