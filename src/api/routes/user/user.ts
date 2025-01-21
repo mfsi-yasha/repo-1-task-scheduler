@@ -3,6 +3,7 @@ import auth from "./routes/auth/auth";
 import authMiddleware from "src/middlewares/auth.middleware";
 import changePassword from "./controllers/changePassword/changePassword";
 import getDetails from "./controllers/getDetails/getDetails";
+import getNotifications from "./controllers/getNotifications/getNotifications";
 
 /**
  * Express router for handling user related routes.
@@ -11,6 +12,11 @@ import getDetails from "./controllers/getDetails/getDetails";
 const user: Router = Router({ mergeParams: true });
 
 user.get("/", authMiddleware.loginController, getDetails.controller);
+user.get(
+	"/get-notifications",
+	authMiddleware.loginController,
+	getNotifications.controller,
+);
 user.patch(
 	"/change-password",
 	authMiddleware.loginController,

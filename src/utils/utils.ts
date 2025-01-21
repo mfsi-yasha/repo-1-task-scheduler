@@ -142,3 +142,13 @@ export function createWordMatchingRegex(
 	// Return the regex that matches any of the extracted words
 	return new RegExp(pattern, combinedFlags);
 }
+
+export function getMinuteDifference(dateOld: Date, dateNew: Date) {
+	// Calculate the difference in milliseconds
+	const differenceInMillis = dateNew.getTime() - dateOld.getTime();
+
+	// Convert milliseconds to minutes
+	const differenceInMinutes = differenceInMillis / (60 * 1000);
+
+	return differenceInMinutes;
+}

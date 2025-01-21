@@ -1,6 +1,7 @@
 import { Schema, model, Types, FilterQuery, Document } from "mongoose";
 import validator from "validator";
-import { createWordMatchingRegex } from "src/utils/utils";
+import { createWordMatchingRegex, getMinuteDifference } from "src/utils/utils";
+import UsersNotificationsModel from "../users/UsersNotifications.model";
 
 export type TaskStatusesT = "toDo" | "inProgress" | "done";
 
@@ -18,7 +19,7 @@ export interface TasksSchema extends TaskSchemaInput {
 }
 
 export interface GetAllTaskFilters {
-	userId: string;
+	userId?: string;
 	searchText?: string;
 	dueDateMin?: string;
 	dueDateMax?: string;
@@ -201,8 +202,10 @@ const getAllTasks = async ({
 }: GetAllTaskFilters): Promise<Array<TasksCompleteData>> => {
 	const query: FilterQuery<TasksSchema> = {
 		deleted: false,
-		userId: filters.userId,
 	};
+	if (filters.userId) {
+		query.userId = filters.userId;
+	}
 	if (filters.searchText?.trim()) {
 		query["$or"] = [
 			{
@@ -258,6 +261,21 @@ const insertTask = async (
 		deleted: false,
 	});
 
+	await UsersNotificationsModel.insertNotification({
+		userId: data.userId,
+		taskId: task._id.toHexString(),
+		type: "taskCreated",
+		description: task.name,
+	});
+
+	if (task.status !== "done") {
+		await UsersNotificationsModel.addDueOroverDue({
+			userId: data.userId,
+			taskId: task._id.toHexString(),
+			minutesDifference: getMinuteDifference(new Date(), task.dueDate),
+		});
+	}
+
 	await task.save();
 	return generateCompleteTaskData(task);
 };
@@ -281,18 +299,52 @@ const updateTask = async ({
 		if (data.name !== undefined) {
 			task.name = data.name;
 			updated = true;
+			await UsersNotificationsModel.insertNotification({
+				userId: userId,
+				taskId: taskId,
+				type: "taskUpdated",
+				description: `Task name updated.`,
+			});
 		}
 		if (data.description !== undefined) {
 			task.description = data.description;
 			updated = true;
+			await UsersNotificationsModel.insertNotification({
+				userId: userId,
+				taskId: taskId,
+				type: "taskUpdated",
+				description: `Task description updated`,
+			});
 		}
 		if (data.status !== undefined) {
+			const oldStatus = task.status;
 			task.status = data.status;
 			updated = true;
+			await UsersNotificationsModel.insertNotification({
+				userId: userId,
+				taskId: taskId,
+				type: "taskUpdated",
+				description: `Task status updated from ${oldStatus} to ${task.status}`,
+			});
 		}
 		if (data.dueDate !== undefined) {
+			const oldDueDate = task.dueDate;
 			task.dueDate = data.dueDate;
 			updated = true;
+			await UsersNotificationsModel.insertNotification({
+				userId: userId,
+				taskId: taskId,
+				type: "taskUpdated",
+				description: `Task due date updated from ${oldDueDate.toISOString()} to ${task.dueDate.toISOString()}`,
+			});
+
+			if (task.status !== "done") {
+				await UsersNotificationsModel.addDueOroverDue({
+					userId: userId,
+					taskId: taskId,
+					minutesDifference: getMinuteDifference(new Date(), task.dueDate),
+				});
+			}
 		}
 
 		if (updated) {

@@ -4,8 +4,10 @@
 	"main": "./src/index.ts",
 	"scripts": {
 		"start": "nodemon -r tsconfig-paths/register ./src/index.ts",
+		"start:cron": "nodemon -r tsconfig-paths/register ./src/cronJob.ts",
 		"build": "npx tsc && node ./build.js",
 		"build:start": "nodemon ./dist/index.js",
+		"build:start:cron": "nodemon ./dist/cronJob.js",
 		"prettier": "prettier --config ./.prettierrc.json --write src/**/*",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
