@@ -1,0 +1,30 @@
+@use "src/scss/variables.scss" as *;
+
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+body {
+	min-height: 100vh;
+
+	.container-global {
+		padding-bottom: 110px;
+
+		@media only screen and (max-width: $grid-breakpoint-md) {
+			padding-bottom: 93px;
+		}
+	}
+}
+
+* {
+	font-family: "Roboto", sans-serif;
+}
+
+.h-0 {
+	height: 0;
+}
+
+.btn {
+	&:focus-visible {
+		outline: auto !important;
+	}
+}
