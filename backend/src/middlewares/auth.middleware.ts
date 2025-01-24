@@ -154,6 +154,60 @@ const signupController = async (
 };
 
 /**
+ * Middleware controller function to handle signup user verification.
+ * @param {RequestType<Params, Body>} req - Express Request object.
+ * @param {ResponseType} res - Express Response object.
+ * @param {NextFunction} next - Express NextFunction.
+ * @returns {Promise<void>}
+ */
+const signupOrLoginController = async (
+	req: RequestType<Params, Body, CookiePayload>,
+	res: ResponseType,
+	next: NextFunction,
+): Promise<void> => {
+	try {
+		// Check if cookiePayload is already set in body. Then fail this request.
+		if (req.body && req.body.cookiePayload) {
+			const returnErr: ResponseDataType<undefined> = {
+				err: true,
+				statusName: "value-not-allowed",
+				msg: "Setting key - cookiePayload is not allowed.",
+				errors: [],
+			};
+			res.status(400).json(returnErr);
+			return;
+		}
+
+		// Access and validate the signed cookie
+		const jwtRes: CookiePayload["cookiePayload"] = validateJWT(
+			req.signedCookies.authToken,
+		);
+
+		if (
+			jwtRes &&
+			jwtRes.userId &&
+			(jwtRes.cookieScope === "signup" || jwtRes.cookieScope === "login")
+		) {
+			// If the authentication token is valid, proceed to the next middleware
+			req.body.cookiePayload = jwtRes;
+			next();
+		} else {
+			throw new Error("Session expired.");
+		}
+	} catch (error: any) {
+		console.error(error);
+		removeCookie(res);
+		const returnErr: ResponseDataType<undefined> = {
+			err: true,
+			statusName: "forbidden",
+			msg: "Forbidden: Session not found.",
+			errors: [],
+		};
+		res.status(403).json(returnErr);
+	}
+};
+
+/**
  * Controller function to check if user is logged in.
  * @param {RequestType<Params, Body>} req - Express Request object.
  * @param {ResponseType} res - Express Response object.
@@ -260,6 +314,7 @@ const logoutController = async (
 export default {
 	resetPasswordController,
 	signupController,
+	signupOrLoginController,
 	loginController,
 	logoutController,
 };

@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import signupApi from "src/apis/user/auth/signup.api";
 import Heading from "src/components/utility/Heading/Heading";
+import { useStore } from "src/hooks/useStore";
 
 const SignUp = () => {
 	const [fullName, setFullName] = useState("");
@@ -8,6 +10,9 @@ const SignUp = () => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [passwordError, setPasswordError] = useState("");
+	const [loading, setLoading] = useState(false);
+	const { dispatch } = useStore();
+	const navigate = useNavigate();
 
 	const handleSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
 		e => {
@@ -17,12 +22,24 @@ const SignUp = () => {
 				return;
 			}
 			setPasswordError("");
-			// Handle form submission here (e.g., send to API)
-			console.log("Full Name:", fullName);
-			console.log("Email:", email);
-			console.log("Password:", password);
+
+			setLoading(true);
+			signupApi({ userFullName: fullName, email, password })
+				.then(res => {
+					dispatch("setStore", {
+						loginInfo: res,
+						loginInfoFetching: "success",
+					});
+					navigate("/verify-user");
+				})
+				.catch(() => {
+					setPasswordError(
+						`Password must contain - minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 and minSymbols: 1.`,
+					);
+					setLoading(false);
+				});
 		},
-		[fullName, email, password, confirmPassword],
+		[fullName, email, password, confirmPassword, dispatch, navigate],
 	);
 
 	return (
@@ -110,9 +127,17 @@ const SignUp = () => {
 								<div className="d-grid">
 									<button
 										type="submit"
-										className="btn btn-primary"
+										className="btn btn-primary d-flex justify-content-center align-items-center gap-2"
 									>
-										Sign Up
+										{loading && (
+											<div
+												className="spinner-border spinner-border-sm text-white"
+												role="status"
+											>
+												<span className="sr-only">Loading...</span>
+											</div>
+										)}
+										<span>Sign Up</span>
 									</button>
 								</div>
 							</form>

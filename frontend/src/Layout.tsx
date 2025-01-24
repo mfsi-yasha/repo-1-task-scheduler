@@ -13,7 +13,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 
 	return (
 		<div>
-			{store.loginInfo ? (
+			{store.loginInfo?.user?.verified ? (
 				<NavBar>
 					<NavBarButton
 						to="/"

@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "./NavBar.module.scss";
 import menuImg from "src/assets/images/Menu.svg";
 import { Link } from "react-router";
+import useLogout from "src/hooks/user/useLogout";
 
 export function NavBarButton({
 	to,
@@ -26,6 +27,7 @@ export function NavBarButton({
 
 function NavBar({ children }: { children: React.ReactNode }) {
 	const [showMenu, setShowMenu] = useState(false);
+	const handleLogout = useLogout();
 
 	return (
 		<div
@@ -54,7 +56,17 @@ function NavBar({ children }: { children: React.ReactNode }) {
 						height={24}
 					/>
 				</button>
-				<i className="fa-regular fa-bell my-auto"></i>
+				<div className="d-flex gap-2">
+					<i
+						className="fa-regular fa-bell my-auto"
+						style={{ cursor: "pointer" }}
+					></i>
+					<i
+						className="fa-solid fa-power-off my-auto"
+						style={{ cursor: "pointer" }}
+						onClick={handleLogout}
+					></i>
+				</div>
 			</div>
 		</div>
 	);

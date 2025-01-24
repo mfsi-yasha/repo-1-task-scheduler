@@ -11,7 +11,7 @@ import getNotifications from "./controllers/getNotifications/getNotifications";
  */
 const user: Router = Router({ mergeParams: true });
 
-user.get("/", authMiddleware.loginController, getDetails.controller);
+user.get("/", authMiddleware.signupOrLoginController, getDetails.controller);
 user.get(
 	"/get-notifications",
 	authMiddleware.loginController,

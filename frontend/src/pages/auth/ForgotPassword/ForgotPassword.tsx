@@ -1,10 +1,13 @@
 import { useCallback, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import requestResetPasswordApi from "src/apis/user/auth/requestResetPassword.api";
 import Heading from "src/components/utility/Heading/Heading";
 
 const ForgotPassword = () => {
 	const [email, setEmail] = useState("");
 	const [emailError, setEmailError] = useState("");
+	const [loading, setLoading] = useState(false);
+	const navigate = useNavigate();
 
 	const handleSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
 		e => {
@@ -14,8 +17,16 @@ const ForgotPassword = () => {
 				return;
 			}
 			setEmailError("");
-			// Handle form submission (e.g., send email reset request to API)
-			console.log("Email:", email);
+
+			setLoading(true);
+			requestResetPasswordApi({ email })
+				.then(() => {
+					navigate("/reset-password");
+				})
+				.catch(() => {
+					setEmailError("Email is not valid!");
+					setLoading(false);
+				});
 		},
 		[email],
 	);
@@ -54,9 +65,17 @@ const ForgotPassword = () => {
 								<div className="d-grid">
 									<button
 										type="submit"
-										className="btn btn-primary"
+										className="btn btn-primary d-flex justify-content-center align-items-center gap-2"
 									>
-										Submit
+										{loading && (
+											<div
+												className="spinner-border spinner-border-sm text-white"
+												role="status"
+											>
+												<span className="sr-only">Loading...</span>
+											</div>
+										)}
+										<span>Submit</span>
 									</button>
 								</div>
 							</form>

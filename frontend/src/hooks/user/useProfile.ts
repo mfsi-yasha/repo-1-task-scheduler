@@ -9,7 +9,6 @@ const authRouteInPathName = (oldPathName: string) => {
 		"/signup",
 		"/forgot-password",
 		"/reset-password",
-		"/verify-user",
 	].join("::");
 
 	return authRoutes.includes(oldPathName.split("/")[1]) &&
@@ -27,19 +26,21 @@ function useProfile() {
 			const oldPathName = window.location.pathname;
 			getUserDetailsApi()
 				.then(res => {
-					console.log(res);
 					dispatch("setStore", {
 						loginInfo: res,
 						loginInfoFetching: "success",
 					});
-					if (authRouteInPathName(oldPathName)) {
-						navigate("/");
+					if (res.user.verified) {
+						if (authRouteInPathName(oldPathName)) {
+							navigate("/");
+						} else {
+							navigate(oldPathName);
+						}
 					} else {
-						navigate(oldPathName);
+						navigate("/verify-user");
 					}
 				})
 				.catch(() => {
-					console.log("hi");
 					dispatch("setStore", {
 						loginInfo: null,
 						loginInfoFetching: "error",

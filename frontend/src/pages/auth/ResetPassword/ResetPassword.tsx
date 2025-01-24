@@ -1,5 +1,7 @@
 import { useCallback, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
+import resendResetPassOTPApi from "src/apis/user/auth/resendResetPassOTP.api";
+import resetPasswordApi from "src/apis/user/auth/resetPassword.api";
 import Heading from "src/components/utility/Heading/Heading";
 
 const ForgotPassword = () => {
@@ -8,6 +10,9 @@ const ForgotPassword = () => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [passwordError, setPasswordError] = useState("");
+	const [loading, setLoading] = useState(false);
+	const [otpLoading, setOtpLoading] = useState(false);
+	const navigate = useNavigate();
 
 	const handleSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
 		e => {
@@ -22,11 +27,31 @@ const ForgotPassword = () => {
 				return;
 			}
 			setPasswordError("");
-			// Handle form submission (e.g., send email reset request to API)
-			console.log("Email:", otp);
+
+			setLoading(true);
+			resetPasswordApi({ otp, newPassword: password })
+				.then(() => {
+					navigate("/login");
+				})
+				.catch(() => {
+					alert(
+						`OTP may be wrong and password must contain - minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1 and minSymbols: 1.`,
+					);
+					setLoading(false);
+				});
 		},
 		[otp, password, confirmPassword],
 	);
+
+	const handleResendOTP = useCallback(() => {
+		setOtpLoading(true);
+		resendResetPassOTPApi()
+			.then(() => {})
+			.catch(() => {})
+			.finally(() => {
+				setOtpLoading(false);
+			});
+	}, []);
 
 	return (
 		<div className="container pt-5">
@@ -100,12 +125,37 @@ const ForgotPassword = () => {
 								<div className="d-grid">
 									<button
 										type="submit"
-										className="btn btn-primary"
+										className="btn btn-primary d-flex justify-content-center align-items-center gap-2"
 									>
-										Submit
+										{loading && (
+											<div
+												className="spinner-border spinner-border-sm text-white"
+												role="status"
+											>
+												<span className="sr-only">Loading...</span>
+											</div>
+										)}
+										<span>Submit</span>
 									</button>
 								</div>
 							</form>
+
+							<div className="d-flex justify-content-center mt-3">
+								<button
+									className="btn btn-secondary d-inline-flex justify-content-center align-items-center gap-2"
+									onClick={handleResendOTP}
+								>
+									{otpLoading && (
+										<div
+											className="spinner-border spinner-border-sm text-white"
+											role="status"
+										>
+											<span className="sr-only">Loading...</span>
+										</div>
+									)}
+									<span>Resend OTP</span>
+								</button>
+							</div>
 
 							<div className="d-flex justify-content-center mt-3">
 								<p>

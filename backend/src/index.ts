@@ -13,6 +13,7 @@ import rateLimit from "express-rate-limit";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import swaggerUi from "swagger-ui-express";
+import path from "path";
 import api from "src/api/api";
 import apiDocs from "src/api/api.docs";
 
@@ -81,16 +82,6 @@ app.use(
 app.use(`${KEYS.APP_ENVS.SERVE_BASE_PATH}/api`, api);
 
 /**
- * Mount the router for public routes.
- * @param path "{KEYS.APP_ENVS.SERVE_BASE_PATH}/" - Base path for serving static files.
- * @param {typeof express.static} callback - Middleware for serving static files.
- */
-app.use(
-	`${KEYS.APP_ENVS.SERVE_BASE_PATH}/`,
-	express.static(KEYS.APP_ENVS.PUBLIC_DIR),
-);
-
-/**
  * Serve swagger ui
  */
 app.use(
@@ -98,6 +89,15 @@ app.use(
 	swaggerUi.serve,
 	swaggerUi.setup(apiDocs),
 );
+
+/**
+ * Mount the router for public routes.
+ */
+app.use(express.static(KEYS.APP_ENVS.PUBLIC_DIR));
+app.get("/*", (req, res) => {
+	const filePath = path.resolve(KEYS.APP_ENVS.PUBLIC_DIR, "index.html");
+	res.sendFile(filePath);
+});
 
 /**
  * Writing global error handller in the last.
