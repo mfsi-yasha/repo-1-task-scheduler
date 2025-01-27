@@ -4,7 +4,9 @@ import { CookiePayload } from "src/middlewares/auth.middleware";
 import TasksModel, { TaskSchemaInput } from "src/models/tasks/Tasks.model";
 
 interface Params {}
-type Body = Omit<TaskSchemaInput, "status" | "dueDate"> & { dueDate: string };
+type Body = Omit<TaskSchemaInput, "status" | "dueDate" | "userId"> & {
+	dueDate: string;
+};
 
 /**
  * Controller function to handle get tesk by id request.

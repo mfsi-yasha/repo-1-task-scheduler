@@ -1,6 +1,15 @@
-function GlobalLoader() {
+function GlobalLoader({
+	className,
+	...props
+}: React.DetailedHTMLProps<
+	React.HTMLAttributes<HTMLDivElement>,
+	HTMLDivElement
+>) {
 	return (
-		<div className="d-flex justify-content-center align-items-center vh-100">
+		<div
+			className={`d-flex justify-content-center align-items-center vh-100 ${className ?? ""}`}
+			{...props}
+		>
 			<div
 				className="spinner-border text-primary"
 				role="status"
