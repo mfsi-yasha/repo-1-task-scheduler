@@ -1,13 +1,15 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { useStoreCreate } from "./hooks/useStore";
 import Layout from "src/Layout";
-import Home from "./pages/Home/Home";
 import Profile from "./pages/Profile/Profile";
 import Login from "./pages/auth/Login/Login";
 import Signup from "./pages/auth/Signup/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword/ResetPassword";
 import VerifyUser from "./pages/auth/VerifyUser/VerifyUser";
+import TaskList from "./pages/tasks/TaskList/TaskList";
+import AddTask from "./pages/tasks/AddTask/AddTask";
+import TaskDetails from "./pages/tasks/TaskDetails/TaskDetails";
 
 function App() {
 	const [store, dispatch, Provider] = useStoreCreate();
@@ -20,7 +22,23 @@ function App() {
 						path="/"
 						element={
 							<Layout>
-								<Home />
+								<TaskList />
+							</Layout>
+						}
+					/>
+					<Route
+						path="/task/new"
+						element={
+							<Layout>
+								<AddTask />
+							</Layout>
+						}
+					/>
+					<Route
+						path="/task/:taskId"
+						element={
+							<Layout>
+								<TaskDetails />
 							</Layout>
 						}
 					/>
