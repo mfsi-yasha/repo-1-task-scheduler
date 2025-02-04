@@ -1,0 +1,40 @@
+@use "src/scss/variables.scss" as *;
+
+.notifications {
+	position: fixed;
+	top: 61px;
+	right: 10px;
+	width: 50vw;
+	height: calc(90vh - 61px);
+	z-index: 101;
+	background: $white;
+	box-shadow: 0px 4px 4px $black-more-transparent;
+	overflow: auto;
+	padding: 16px;
+
+	@media only screen and (max-width: $grid-breakpoint-md) {
+		padding: 12px;
+		width: calc(100vw - 20px);
+	}
+}
+
+/* Badge styles for different notification types */
+.taskCreated {
+	background-color: #28a745; /* Green for task created */
+	color: white;
+}
+
+.taskDue {
+	background-color: #ffc107; /* Yellow for task updated */
+	color: white;
+}
+
+.taskOverDue {
+	background-color: #dc3545; /* Red for task overdue */
+	color: white;
+}
+
+.taskUpdated {
+	background-color: #007bff; /* Blue for task due */
+	color: white;
+}

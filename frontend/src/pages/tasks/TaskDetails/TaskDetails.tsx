@@ -65,17 +65,29 @@ const TaskDetails = () => {
 
 	const handleSave = useCallback(() => {
 		if (task) {
-			setLoading(true);
-			handleUpdateTask({
-				name: task.name,
-				description: task.description,
-				dueDate: task.dueDate.split("T")[0],
-			})
-				.then(() => {})
-				.catch(() => {})
-				.finally(() => {
-					setLoading(false);
-				});
+			const params: Omit<UpdateTaskParams, "taskId"> = {};
+
+			if (task.name !== ogTask.current?.name) {
+				params.name = task.name;
+			}
+			if (task.description !== ogTask.current?.description) {
+				params.description = task.description;
+			}
+			if (task.dueDate !== ogTask.current?.dueDate) {
+				params.dueDate = task.dueDate.split("T")[0];
+			}
+
+			if (Object.keys(params).length) {
+				setLoading(true);
+				handleUpdateTask(params)
+					.then(() => {})
+					.catch(() => {})
+					.finally(() => {
+						setLoading(false);
+					});
+			} else {
+				setEditing(false);
+			}
 		}
 	}, [handleUpdateTask, task]);
 
@@ -151,15 +163,17 @@ const TaskDetails = () => {
 													style={{ width: "150px" }}
 													type="button"
 													onClick={() => {
-														setTask(p =>
-															p
-																? {
-																		...p,
-																		status: status.key,
-																	}
-																: p,
-														);
-														handleUpdateTask({ status: status.key });
+														if (status.key !== task.status) {
+															setTask(p =>
+																p
+																	? {
+																			...p,
+																			status: status.key,
+																		}
+																	: p,
+															);
+															handleUpdateTask({ status: status.key });
+														}
 														setShowDD(false);
 													}}
 												>

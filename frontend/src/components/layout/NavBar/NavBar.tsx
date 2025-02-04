@@ -3,6 +3,7 @@ import styles from "./NavBar.module.scss";
 import menuImg from "src/assets/images/Menu.svg";
 import { Link } from "react-router";
 import useLogout from "src/hooks/user/useLogout";
+import Notifications from "src/features/Notifications/Notifications";
 
 export function NavBarButton({
 	to,
@@ -27,6 +28,7 @@ export function NavBarButton({
 
 function NavBar({ children }: { children: React.ReactNode }) {
 	const [showMenu, setShowMenu] = useState(false);
+	const [showNotifications, setShowNotifications] = useState(false);
 	const handleLogout = useLogout();
 
 	return (
@@ -60,6 +62,9 @@ function NavBar({ children }: { children: React.ReactNode }) {
 					<i
 						className="fa-regular fa-bell my-auto"
 						style={{ cursor: "pointer" }}
+						onClick={() => {
+							setShowNotifications(v => !v);
+						}}
 					></i>
 					<i
 						className="fa-solid fa-power-off my-auto"
@@ -68,6 +73,13 @@ function NavBar({ children }: { children: React.ReactNode }) {
 					></i>
 				</div>
 			</div>
+			{showNotifications && (
+				<Notifications
+					onHide={() => {
+						setShowNotifications(false);
+					}}
+				/>
+			)}
 		</div>
 	);
 }

@@ -13,7 +13,7 @@ const interval = async () => {
 			const task = tasks[i];
 
 			if (task.status !== "done") {
-				await UsersNotificationsModel.addDueOroverDue({
+				await UsersNotificationsModel.addDueOverDue({
 					userId: task.userId,
 					taskId: task.taskId,
 					minutesDifference: getMinuteDifference(new Date(), task.dueDate),

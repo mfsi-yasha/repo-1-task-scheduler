@@ -143,7 +143,7 @@ const insertNotification = async (
 ) => {
 	const notification = new UsersNotificationM({
 		userId: data.userId,
-		taskId: data.userId,
+		taskId: data.taskId,
 		description: data.description,
 		type: data.type,
 	});
@@ -152,7 +152,7 @@ const insertNotification = async (
 	return generateCompleteUsersNotificationData(notification);
 };
 
-const addDueOroverDue = async ({
+const addDueOverDue = async ({
 	minutesDifference,
 	...data
 }: {
@@ -179,5 +179,5 @@ export default {
 	getUsersNotificationById,
 	getAllUsersNotification,
 	insertNotification,
-	addDueOroverDue,
+	addDueOverDue,
 };

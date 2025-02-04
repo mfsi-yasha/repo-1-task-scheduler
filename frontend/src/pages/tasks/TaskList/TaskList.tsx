@@ -110,7 +110,7 @@ const TaskList = () => {
 					>
 						<span>{task.name}</span>
 						<div className="d-flex gap-3 justify-content-between align-items-center">
-							<OverDue dueDate={task.dueDate} />
+							{task.status !== "done" && <OverDue dueDate={task.dueDate} />}
 							<button
 								className="btn btn-info"
 								onClick={() => {

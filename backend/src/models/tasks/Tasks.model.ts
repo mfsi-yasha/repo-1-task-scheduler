@@ -34,6 +34,11 @@ export const taskStatuses: Array<TaskStatusesT> = [
 	"inProgress",
 	"done",
 ];
+export const taskStatusesLabels: Record<TaskStatusesT, string> = {
+	toDo: "To Do",
+	inProgress: "In Progress",
+	done: "Done",
+};
 
 type TasksDocument = Document<unknown, {}, TasksSchema> &
 	TasksSchema & {
@@ -269,7 +274,7 @@ const insertTask = async (
 	});
 
 	if (task.status !== "done") {
-		await UsersNotificationsModel.addDueOroverDue({
+		await UsersNotificationsModel.addDueOverDue({
 			userId: data.userId,
 			taskId: task._id.toHexString(),
 			minutesDifference: getMinuteDifference(new Date(), task.dueDate),
@@ -313,7 +318,7 @@ const updateTask = async ({
 				userId: userId,
 				taskId: taskId,
 				type: "taskUpdated",
-				description: `Task description updated`,
+				description: `Task description updated.`,
 			});
 		}
 		if (data.status !== undefined) {
@@ -324,7 +329,7 @@ const updateTask = async ({
 				userId: userId,
 				taskId: taskId,
 				type: "taskUpdated",
-				description: `Task status updated from ${oldStatus} to ${task.status}`,
+				description: `Task status updated from ${taskStatusesLabels[oldStatus]} to ${taskStatusesLabels[task.status]}`,
 			});
 		}
 		if (data.dueDate !== undefined) {
@@ -335,11 +340,11 @@ const updateTask = async ({
 				userId: userId,
 				taskId: taskId,
 				type: "taskUpdated",
-				description: `Task due date updated from ${oldDueDate.toISOString()} to ${task.dueDate.toISOString()}`,
+				description: `Task due date updated from ${oldDueDate.toLocaleDateString("en-us", { year: "numeric", month: "short", day: "numeric" })} to ${task.dueDate.toLocaleDateString("en-us", { year: "numeric", month: "short", day: "numeric" })}`,
 			});
 
 			if (task.status !== "done") {
-				await UsersNotificationsModel.addDueOroverDue({
+				await UsersNotificationsModel.addDueOverDue({
 					userId: userId,
 					taskId: taskId,
 					minutesDifference: getMinuteDifference(new Date(), task.dueDate),
