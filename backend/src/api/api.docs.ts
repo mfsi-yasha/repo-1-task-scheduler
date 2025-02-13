@@ -11,6 +11,8 @@ import userAuthResetPasswordReqDocs from "./routes/user/routes/auth/controllers/
 import userGetDetailsDocs from "./routes/user/controllers/getDetails/user.getDetails.docs";
 import tasksDocs from "./routes/tasks/tasks.docs";
 import userGetNotificationsDocs from "./routes/user/controllers/getNotifications/user.getNotifications.docs";
+import userGetNotificationsCountDocs from "./routes/user/controllers/getNotificationsCount/user.getNotificationsCount.docs";
+import userMarkNotificationsReadDocs from "./routes/user/controllers/markNotificationsRead/user.markNotificationsRead.docs";
 
 const apiDocs: OpenAPIV3.Document = {
 	openapi: "3.0.3",
@@ -59,6 +61,8 @@ const apiDocs: OpenAPIV3.Document = {
 		...userAuthResendOTPDocs,
 		...userAuthResetPasswordDocs,
 		...userGetNotificationsDocs,
+		...userGetNotificationsCountDocs,
+		...userMarkNotificationsReadDocs,
 		...tasksDocs,
 	},
 	components: {

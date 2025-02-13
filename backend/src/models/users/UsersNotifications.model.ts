@@ -11,6 +11,7 @@ export interface UsersNotificationSchema {
 	taskId: Types.ObjectId;
 	description: string;
 	type: NotificationTypes;
+	isRead: boolean;
 	createdAt: Date;
 }
 
@@ -73,6 +74,10 @@ const usersNotificationSchema = new Schema<UsersNotificationSchema>(
 					`Key - status can not be anything other than ${JSON.stringify(notificationTypesArray)}!`,
 			},
 		},
+		isRead: {
+			type: Boolean,
+			required: [true, "Key - isRead is required."],
+		},
 	},
 	{ timestamps: { createdAt: true, updatedAt: false } },
 );
@@ -88,6 +93,7 @@ const generateCompleteUsersNotificationData = (
 		taskId: notification.taskId.toHexString(),
 		description: notification.description,
 		type: notification.type,
+		isRead: notification.isRead,
 		createdAt: notification.createdAt,
 	};
 	return data;
@@ -136,7 +142,10 @@ const getAllUsersNotification = async ({
  * Insert a new notification.
  */
 const insertNotification = async (
-	data: Omit<UsersNotificationSchema, "userId" | "taskId" | "createdAt"> & {
+	data: Omit<
+		UsersNotificationSchema,
+		"userId" | "taskId" | "createdAt" | "isRead"
+	> & {
 		userId: string;
 		taskId: string;
 	},
@@ -146,6 +155,7 @@ const insertNotification = async (
 		taskId: data.taskId,
 		description: data.description,
 		type: data.type,
+		isRead: false,
 	});
 
 	await notification.save();
@@ -175,9 +185,32 @@ const addDueOverDue = async ({
 	}
 };
 
+const markAsRead = async ({
+	notificationId,
+	userId,
+}: {
+	notificationId: string;
+	userId: string;
+}) => {
+	const notification = await UsersNotificationM.findOne({
+		_id: notificationId,
+		userId,
+	});
+	if (notification) {
+		notification.isRead = true;
+		await notification.save();
+	}
+};
+
+const getUnreadCount = async ({ userId }: { userId: string }) => {
+	return await UsersNotificationM.countDocuments({ userId, isRead: false });
+};
+
 export default {
 	getUsersNotificationById,
 	getAllUsersNotification,
 	insertNotification,
 	addDueOverDue,
+	markAsRead,
+	getUnreadCount,
 };

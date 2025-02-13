@@ -4,6 +4,7 @@ import menuImg from "src/assets/images/Menu.svg";
 import { Link } from "react-router";
 import useLogout from "src/hooks/user/useLogout";
 import Notifications from "src/features/Notifications/Notifications";
+import useNotificationCount from "src/hooks/user/useNotificationCount";
 
 export function NavBarButton({
 	to,
@@ -30,6 +31,7 @@ function NavBar({ children }: { children: React.ReactNode }) {
 	const [showMenu, setShowMenu] = useState(false);
 	const [showNotifications, setShowNotifications] = useState(false);
 	const handleLogout = useLogout();
+	const notificationCount = useNotificationCount();
 
 	return (
 		<div
@@ -58,14 +60,26 @@ function NavBar({ children }: { children: React.ReactNode }) {
 						height={24}
 					/>
 				</button>
-				<div className="d-flex gap-2">
+				<div className="d-flex gap-4">
 					<i
-						className="fa-regular fa-bell my-auto"
+						className={`${showNotifications ? "fa-solid" : "fa-regular"} fa-bell my-auto text-primary d-flex gap-2 justify-content-center align-items-center`}
 						style={{ cursor: "pointer" }}
 						onClick={() => {
 							setShowNotifications(v => !v);
 						}}
-					></i>
+					>
+						{notificationCount > 0 && (
+							<span
+								className="badge rounded-pill bg-danger"
+								style={{
+									fontSize: "0.75rem",
+									padding: "0.3rem 0.6rem",
+								}}
+							>
+								{notificationCount}
+							</span>
+						)}
+					</i>
 					<i
 						className="fa-solid fa-power-off my-auto"
 						style={{ cursor: "pointer" }}

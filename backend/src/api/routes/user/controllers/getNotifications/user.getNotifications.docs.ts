@@ -60,6 +60,9 @@ const userGetNotificationsDocs: OpenAPIV3.PathsObject = {
 															type: "string",
 															enum: notificationTypesArray,
 														},
+														isRead: {
+															type: "boolean",
+														},
 														createdAt: {
 															type: "string",
 															format: "date-time",
@@ -71,6 +74,7 @@ const userGetNotificationsDocs: OpenAPIV3.PathsObject = {
 														"userId",
 														"description",
 														"type",
+														"isRead",
 														"createdAt",
 													],
 												},

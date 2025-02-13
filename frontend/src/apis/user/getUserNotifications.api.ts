@@ -12,6 +12,7 @@ export interface UsersNotification {
 	taskId: string;
 	description: string;
 	type: NotificationTypes;
+	isRead: boolean;
 	createdAt: string;
 }
 

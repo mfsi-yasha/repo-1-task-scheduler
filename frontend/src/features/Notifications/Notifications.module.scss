@@ -18,6 +18,10 @@
 	}
 }
 
+.activeNotification {
+	background-color: #007bff34; /* Blue for task due */
+}
+
 /* Badge styles for different notification types */
 .taskCreated {
 	background-color: #28a745; /* Green for task created */
