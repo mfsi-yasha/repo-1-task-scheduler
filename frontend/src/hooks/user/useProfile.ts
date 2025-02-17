@@ -45,7 +45,6 @@ function useProfile() {
 						loginInfo: null,
 						loginInfoFetching: "error",
 					});
-					console.log(oldPathName);
 					if (authRouteInPathName(oldPathName)) {
 						navigate(oldPathName);
 					} else {

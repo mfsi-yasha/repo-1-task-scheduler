@@ -195,13 +195,12 @@ const signupOrLoginController = async (
 			throw new Error("Session expired.");
 		}
 	} catch (error: any) {
-		console.error(error);
 		removeCookie(res);
 		const returnErr: ResponseDataType<undefined> = {
 			err: true,
 			statusName: "forbidden",
 			msg: "Forbidden: Session not found.",
-			errors: [],
+			errors: [error.message],
 		};
 		res.status(403).json(returnErr);
 	}

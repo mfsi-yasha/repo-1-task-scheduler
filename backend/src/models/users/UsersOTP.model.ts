@@ -40,7 +40,17 @@ const updateUsersOTP = async (data: UsersOTPPayload) => {
 	}
 
 	const otp =
-		KEYS.APP_ENVS.NODE_ENV === "development" ? "000000" : generateOTP();
+		KEYS.APP_ENVS.NODE_ENV === "development" ||
+		KEYS.APP_ENVS.NODE_ENV === "test"
+			? "000000"
+			: generateOTP();
+
+	if (
+		KEYS.APP_ENVS.NODE_ENV === "development" ||
+		KEYS.APP_ENVS.NODE_ENV === "test"
+	) {
+		console.log(`OTP is ${otp}`);
+	}
 
 	const encryptedOTP = await encryptPassword(otp);
 	const signedOTP = createJWT({ otp: encryptedOTP }, { expiresIn: "1h" });

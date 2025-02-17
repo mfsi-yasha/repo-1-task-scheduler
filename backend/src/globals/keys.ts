@@ -6,7 +6,11 @@ const APP_ENVS = {
 	PORT: parseInt(process.env.PORT ?? ""),
 	LOGS_DIR: process.env.LOGS_DIR as string,
 	PUBLIC_DIR: process.env.PUBLIC_DIR as string,
-	NODE_ENV: process.env.NODE_ENV as "development" | "production" | "staging",
+	NODE_ENV: process.env.NODE_ENV as
+		| "development"
+		| "production"
+		| "staging"
+		| "test",
 	JWT_SECRET: process.env.JWT_SECRET as string,
 	COOKIE_SECRET: process.env.COOKIE_SECRET as string,
 	SERVE_BASE_PATH: process.env.SERVE_BASE_PATH as string,
@@ -50,11 +54,12 @@ for (const key in KEYS) {
 					!(
 						element[eleKey] === "development" ||
 						element[eleKey] === "production" ||
-						element[eleKey] === "staging"
+						element[eleKey] === "staging" ||
+						element[eleKey] === "test"
 					)
 				) {
 					undefinedKeys.push(
-						`(Allowed NODE_ENV are development, production and staging)`,
+						`(Allowed NODE_ENV are development, production, staging and test)`,
 					);
 				}
 				break;
