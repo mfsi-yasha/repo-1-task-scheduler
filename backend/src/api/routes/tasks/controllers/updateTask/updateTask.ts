@@ -67,7 +67,7 @@ const controller = async (
 						: true
 					: true
 		) {
-			errors.push("Key - status is not date.");
+			errors.push("Key - status is not valid.");
 		}
 
 		if (errors.length) {
