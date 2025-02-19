@@ -1,0 +1,7 @@
+@use "src/scss/variables.scss" as *;
+
+.noDataFound {
+	font-weight: 400;
+	font-size: 15px;
+	color: $black-transparent;
+}

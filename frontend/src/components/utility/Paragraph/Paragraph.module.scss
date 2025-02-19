@@ -1,0 +1,7 @@
+@use "src/scss/variables.scss" as *;
+
+.paragraph {
+	font-weight: 400;
+	font-size: 15px;
+	color: $brown;
+}

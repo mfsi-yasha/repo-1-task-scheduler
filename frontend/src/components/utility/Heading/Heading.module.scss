@@ -1,0 +1,11 @@
+@use "src/scss/variables.scss" as *;
+
+.heading {
+	font-weight: 700;
+	font-size: 40px;
+	color: $brown;
+
+	@media only screen and (max-width: $grid-breakpoint-md) {
+		font-size: 30px;
+	}
+}

@@ -1,0 +1,13 @@
+process.env.NODE_ENV = "test"; // Set appropriate NODE_ENV
+process.env.PORT = "8000"; // Example mock value
+process.env.LOGS_DIR = "./logs"; // Example mock value
+process.env.PUBLIC_DIR = "./public"; // Example mock value
+process.env.JWT_SECRET = "your-secret-key"; // Example mock value
+process.env.COOKIE_SECRET = "cookie-secret"; // Example mock value
+process.env.SERVE_BASE_PATH = "/v1"; // Example mock value
+process.env.MONGODB_SERVER = "mongodb://localhost:27017/taskSchedulerTest"; // Example mock value
+process.env.SMTPSERVER_HOST = "smtp.example.com"; // Example mock value
+process.env.SMTPSERVER_PORT = "587"; // Example mock value
+process.env.SMTPSERVER_USER = "user"; // Example mock value
+process.env.SMTPSERVER_PASSWORD = "password"; // Example mock value
+process.env.SMTPSERVER_SENDER = "sender@example.com"; // Example mock value

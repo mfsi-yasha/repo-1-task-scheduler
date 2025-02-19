@@ -1,0 +1,55 @@
+@use "src/scss/variables.scss" as *;
+
+$nav-height: 60px;
+
+.navbar {
+	position: sticky;
+	z-index: 100;
+	height: $nav-height;
+	left: 0px;
+	top: 0px;
+	background: $white;
+	box-shadow: 0px 4px 4px $black-transparent;
+
+	.navMenu {
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: calc($nav-height + 1px);
+		background: $white;
+		overflow: hidden;
+		transition: height 300ms ease-in-out;
+		height: 0px;
+		&.activeMenu {
+			height: 80px;
+			box-shadow: 0px 4px 4px $black-transparent;
+			@media only screen and (min-width: $grid-breakpoint-md) {
+				height: auto;
+				box-shadow: none;
+			}
+		}
+		@media only screen and (min-width: $grid-breakpoint-md) {
+			position: static;
+			box-shadow: none;
+			transition: none;
+			height: auto;
+		}
+	}
+
+	.navButton {
+		font-weight: 500;
+		font-size: 16px;
+		color: $grey;
+		display: flex;
+		align-items: center;
+
+		&.active {
+			font-weight: 700;
+			color: $green;
+		}
+
+		&:active {
+			border-color: transparent;
+		}
+	}
+}
