@@ -3,37 +3,45 @@ import validator from "validator";
 import { createWordMatchingRegex, getMinuteDifference } from "src/utils/utils";
 import UsersNotificationsModel from "../users/UsersNotifications.model";
 
+// Define task statuses as type
 export type TaskStatusesT = "toDo" | "inProgress" | "done";
 
+// Define the structure for the input to create a task
 export interface TaskSchemaInput {
-	userId: Types.ObjectId;
-	name: string;
-	description: string;
-	status: TaskStatusesT;
-	dueDate: Date;
+	userId: Types.ObjectId; // The ID of the user who owns the task
+	name: string; // The name of the task
+	description: string; // Description of the task
+	status: TaskStatusesT; // The current status of the task
+	dueDate: Date; // The due date for the task
 }
+
+// Define the structure for tasks in the database, including metadata
 export interface TasksSchema extends TaskSchemaInput {
-	deleted: boolean;
-	createdAt: Date;
-	updatedAt: Date;
+	deleted: boolean; // Flag to mark if the task is deleted
+	createdAt: Date; // Timestamp of when the task was created
+	updatedAt: Date; // Timestamp of the last update of the task
 }
 
+// Filters for retrieving tasks
 export interface GetAllTaskFilters {
-	userId?: string;
-	searchText?: string;
-	dueDateMin?: string;
-	dueDateMax?: string;
-	createdDateMin?: string;
-	createdDateMax?: string;
-	start?: number;
-	limit?: number;
+	userId?: string; // Optional user ID filter
+	searchText?: string; // Optional text search for task name or description
+	dueDateMin?: string; // Optional filter for tasks with due dates after this date
+	dueDateMax?: string; // Optional filter for tasks with due dates before this date
+	createdDateMin?: string; // Optional filter for tasks created after this date
+	createdDateMax?: string; // Optional filter for tasks created before this date
+	start?: number; // Optional pagination start index
+	limit?: number; // Optional pagination limit (max 25)
 }
 
+// List of possible task statuses
 export const taskStatuses: Array<TaskStatusesT> = [
 	"toDo",
 	"inProgress",
 	"done",
 ];
+
+// Labels for each task status
 export const taskStatusesLabels: Record<TaskStatusesT, string> = {
 	toDo: "To Do",
 	inProgress: "In Progress",
@@ -45,11 +53,13 @@ type TasksDocument = Document<unknown, {}, TasksSchema> &
 		_id: Types.ObjectId;
 	};
 
+// Represents a task with complete data for a user
 export type TasksCompleteData = Omit<TasksSchema, "userId"> & {
-	taskId: string;
-	userId: string;
+	taskId: string; // The task ID
+	userId: string; // The user ID associated with the task
 };
 
+// Define Mongoose schema for tasks
 const tasksSchema = new Schema<TasksSchema>(
 	{
 		userId: {
@@ -60,24 +70,24 @@ const tasksSchema = new Schema<TasksSchema>(
 			type: String,
 			required: [true, "Key - name is required."],
 			trim: true,
-			maxlength: [250, "Key - name length ust be <= 250 charecters."],
+			maxlength: [250, "Key - name length must be <= 250 characters."],
 			validate: {
 				validator: function (v: string) {
 					return v.trim().length !== 0;
 				},
-				message: props => `Key - name can not be empty!`,
+				message: props => `Key - name cannot be empty!`,
 			},
 		},
 		description: {
 			type: String,
 			required: [true, "Key - description is required."],
 			trim: true,
-			maxlength: [1000, "Key - description length ust be <= 1000 charecters."],
+			maxlength: [1000, "Key - description length must be <= 1000 characters."],
 			validate: {
 				validator: function (v: string) {
 					return v.trim().length !== 0;
 				},
-				message: props => `Key - description can not be empty!`,
+				message: props => `Key - description cannot be empty!`,
 			},
 		},
 		status: {
@@ -89,7 +99,7 @@ const tasksSchema = new Schema<TasksSchema>(
 					return taskStatuses.includes(v);
 				},
 				message: props =>
-					`Key - status can not be anything other than ${JSON.stringify(taskStatuses)}!`,
+					`Key - status cannot be anything other than ${JSON.stringify(taskStatuses)}!`,
 			},
 		},
 		dueDate: {
@@ -106,6 +116,9 @@ const tasksSchema = new Schema<TasksSchema>(
 
 const TasksM = model("Tasks", tasksSchema);
 
+/**
+ * Generate complete task data for a user (includes taskId and userId as strings)
+ */
 const generateCompleteTaskData = (task: TasksDocument) => {
 	const data: TasksCompleteData = {
 		taskId: task._id.toHexString(),
@@ -122,7 +135,7 @@ const generateCompleteTaskData = (task: TasksDocument) => {
 };
 
 /**
- * Retrieve task by id.
+ * Retrieve a task by its ID for a specific user.
  */
 const getTaskById = async (taskId: string, userId: string) => {
 	const task = await TasksM.findOne({ _id: taskId, userId, deleted: false });
@@ -133,6 +146,9 @@ const getTaskById = async (taskId: string, userId: string) => {
 	}
 };
 
+/**
+ * Retrieve multiple tasks by their IDs for a specific user.
+ */
 const getTasksByIds = async (ids: Array<string>, userId: string) => {
 	const tasks = await TasksM.find({
 		_id: { $in: ids.map(id => new Types.ObjectId(id)) },
@@ -142,6 +158,9 @@ const getTasksByIds = async (ids: Array<string>, userId: string) => {
 	return tasks.map(user => generateCompleteTaskData(user));
 };
 
+/**
+ * Validate task filters for pagination, date ranges, and search text.
+ */
 const validateFilters = (filters: GetAllTaskFilters) => {
 	const errors: Array<string> = [];
 
@@ -158,6 +177,8 @@ const validateFilters = (filters: GetAllTaskFilters) => {
 			filters.start = parseInt(filters.start + "");
 		}
 	}
+
+	// Validate limit filter (max 25 tasks per page)
 	if (filters.limit !== undefined) {
 		if (
 			typeof parseInt(filters.limit + "") === "number"
@@ -171,35 +192,44 @@ const validateFilters = (filters: GetAllTaskFilters) => {
 			filters.limit = parseInt(filters.limit + "");
 		}
 	}
+
+	// Validate date filters and search text
 	if (filters.searchText !== undefined) {
 		if (typeof filters.searchText !== "string") {
 			errors.push("Key - searchText must be a string.");
 		}
 	}
-	if (filters.createdDateMax !== undefined) {
-		if (!validator.isDate(filters.createdDateMax)) {
-			errors.push("Key - createdDateMax must be a date.");
-		}
+	if (
+		filters.createdDateMax !== undefined &&
+		!validator.isDate(filters.createdDateMax)
+	) {
+		errors.push("Key - createdDateMax must be a date.");
 	}
-	if (filters.createdDateMin !== undefined) {
-		if (!validator.isDate(filters.createdDateMin)) {
-			errors.push("Key - createdDateMin must be a date.");
-		}
+	if (
+		filters.createdDateMin !== undefined &&
+		!validator.isDate(filters.createdDateMin)
+	) {
+		errors.push("Key - createdDateMin must be a date.");
 	}
-	if (filters.dueDateMax !== undefined) {
-		if (!validator.isDate(filters.dueDateMax)) {
-			errors.push("Key - dueDateMax must be a date.");
-		}
+	if (
+		filters.dueDateMax !== undefined &&
+		!validator.isDate(filters.dueDateMax)
+	) {
+		errors.push("Key - dueDateMax must be a date.");
 	}
-	if (filters.dueDateMin !== undefined) {
-		if (!validator.isDate(filters.dueDateMin)) {
-			errors.push("Key - dueDateMin must be a date.");
-		}
+	if (
+		filters.dueDateMin !== undefined &&
+		!validator.isDate(filters.dueDateMin)
+	) {
+		errors.push("Key - dueDateMin must be a date.");
 	}
 
 	return errors;
 };
 
+/**
+ * Get all tasks based on filters such as date range, search text, etc.
+ */
 const getAllTasks = async ({
 	start = 0,
 	limit = 25,
@@ -252,7 +282,7 @@ const getAllTasks = async ({
 };
 
 /**
- * Insert a new task.
+ * Insert a new task into the database and send notifications to the user.
  */
 const insertTask = async (
 	data: Omit<TaskSchemaInput, "userId"> & { userId: string },
@@ -273,6 +303,7 @@ const insertTask = async (
 		description: task.name,
 	});
 
+	// If task is not done, add due/overdue notification
 	if (task.status !== "done") {
 		await UsersNotificationsModel.addDueOverDue({
 			userId: data.userId,
@@ -286,7 +317,7 @@ const insertTask = async (
 };
 
 /**
- * Update an existing task.
+ * Update an existing task and notify the user of changes.
  */
 const updateTask = async ({
 	taskId,
@@ -364,7 +395,7 @@ const updateTask = async ({
 };
 
 /**
- * Delete task by id.
+ * Mark a task as deleted.
  */
 const deleteTaskById = async (id: string) => {
 	const task = await TasksM.findById(id);

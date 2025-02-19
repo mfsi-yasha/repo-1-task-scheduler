@@ -6,6 +6,18 @@ import useLogout from "src/hooks/user/useLogout";
 import Notifications from "src/features/Notifications/Notifications";
 import useNotificationCount from "src/hooks/user/useNotificationCount";
 
+/**
+ * Button component for rendering navigation links in the Navbar.
+ *
+ * This component creates a button that links to a specified route and can
+ * be styled to indicate the active state.
+ *
+ * @param to The route path to navigate to when the button is clicked.
+ * @param text The text to display inside the button.
+ * @param isActive Optional flag to indicate whether the button should be styled as active.
+ * @param className Optional additional CSS class names to apply to the button.
+ * @returns A navigation button component.
+ */
 export function NavBarButton({
 	to,
 	text,
@@ -27,6 +39,16 @@ export function NavBarButton({
 	);
 }
 
+/**
+ * Navbar component containing the application logo, menu, notifications, and logout options.
+ *
+ * This component renders the primary layout for the navbar, with menu buttons,
+ * notifications icon, and logout functionality. It also conditionally renders the
+ * notifications popup when clicked.
+ *
+ * @param children Child elements to render inside the navbar menu.
+ * @returns A Navbar component with all associated buttons and functionality.
+ */
 function NavBar({ children }: { children: React.ReactNode }) {
 	const [showMenu, setShowMenu] = useState(false);
 	const [showNotifications, setShowNotifications] = useState(false);
@@ -54,7 +76,7 @@ function NavBar({ children }: { children: React.ReactNode }) {
 				>
 					<img
 						src={menuImg}
-						alt=""
+						alt="Menu"
 						loading="lazy"
 						width={24}
 						height={24}

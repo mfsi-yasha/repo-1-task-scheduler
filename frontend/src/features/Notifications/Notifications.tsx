@@ -8,7 +8,12 @@ import styles from "./Notifications.module.scss";
 import { useNavigate } from "react-router";
 import markNotificationReadApi from "src/apis/user/markNotificationRead.api";
 
-// Notification Type Labels
+/**
+ * Maps notification types to human-readable labels.
+ *
+ * @param type The notification type.
+ * @returns The corresponding label for the notification type.
+ */
 const getTypeLabel = (type: NotificationTypes) => {
 	switch (type) {
 		case "taskCreated":
@@ -24,7 +29,12 @@ const getTypeLabel = (type: NotificationTypes) => {
 	}
 };
 
-// Badge styles for each notification type
+/**
+ * Maps notification types to corresponding badge styles.
+ *
+ * @param type The notification type.
+ * @returns The class name for the badge style associated with the notification type.
+ */
 const getBadgeClass = (type: NotificationTypes) => {
 	switch (type) {
 		case "taskCreated":
@@ -42,6 +52,15 @@ const getBadgeClass = (type: NotificationTypes) => {
 
 const NOTIFICATION_FETCH_LIMIT = 25;
 
+/**
+ * Component to display user notifications and handle loading more notifications.
+ *
+ * This component fetches user notifications, displays them in a list, and allows the user to load
+ * more notifications as they scroll. It also handles marking notifications as read when clicked.
+ *
+ * @param onHide A callback to close the notifications list when a notification is clicked.
+ * @returns JSX element to render the notifications list.
+ */
 const Notifications = ({ onHide }: { onHide: () => void }) => {
 	const navigate = useNavigate();
 	const [notifications, setNotifications] = useState<UsersNotification[]>([]);
@@ -49,6 +68,11 @@ const Notifications = ({ onHide }: { onHide: () => void }) => {
 	const [hasMore, setHasMore] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
+	/**
+	 * Fetches notifications starting from a specific index and appends them to the current list.
+	 *
+	 * @param start The starting index for fetching notifications.
+	 */
 	const fetchNotifications = useCallback(async (start: number) => {
 		setLoading(true);
 		setError(null);
@@ -69,12 +93,20 @@ const Notifications = ({ onHide }: { onHide: () => void }) => {
 		}
 	}, []);
 
+	/**
+	 * Loads more notifications if available.
+	 */
 	const handleLoadMore = useCallback(() => {
 		if (hasMore) {
 			fetchNotifications(notifications.length);
 		}
 	}, [hasMore, notifications]);
 
+	/**
+	 * Marks a notification as read.
+	 *
+	 * @param notificationId The ID of the notification to mark as read.
+	 */
 	const markNotificationRead = useCallback((notificationId: string) => {
 		markNotificationReadApi({ notificationId });
 	}, []);
