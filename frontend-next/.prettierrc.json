@@ -1,0 +1,11 @@
+{
+	"tabWidth": 2,
+	"semi": true,
+	"singleQuote": false,
+	"arrowParens": "avoid",
+	"singleAttributePerLine": true,
+	"endOfLine": "lf",
+	"htmlWhitespaceSensitivity": "ignore",
+	"trailingComma": "all",
+	"useTabs": true
+}
